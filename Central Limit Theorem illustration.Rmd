@@ -1,0 +1,68 @@
+---
+jupyter:
+  jupytext:
+    notebook_metadata_filter: all,-language_info
+    split_at_heading: true
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.2'
+      jupytext_version: 1.10.0
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+---
+
+```{python}
+import numpy as np
+import numpy.random as npr  # Convenient shortcut
+import matplotlib.pyplot as plt
+```
+
+```{python}
+# inspired by Agresti, Statistical Methods for the Social Sciences, 2018, 5th Ed., pg.100
+size = 5000
+
+distributions = [
+    npr.normal(1, 10, size=size),
+    npr.gamma(2, 1, size=size),
+    np.concatenate(
+    (npr.normal(1, 2, size=size),
+     npr.normal(10, 1.5, size=size))
+    ),
+    npr.hypergeometric(20, 20, 5, size=size),
+    npr.uniform(size=size)
+]
+```
+
+```{python}
+n_iters = 1000
+samp_size = 20
+samp_ds = [] 
+
+for dist in distributions:
+    samp_d = np.zeros(n_iters)
+    for i in np.arange(n_iters):
+        sample = np.random.choice(dist, size=samp_size)
+        samp_d[i] = np.mean(sample)
+    samp_ds.append(samp_d)
+```
+
+```{python}
+fig1, axes1 = plt.subplots(1, 5, figsize = (16, 4))
+fig2, axes2 = plt.subplots(1, 5, figsize = (16, 4))
+colors = ['red', 'blue', 'orange', 'cyan', 'green']
+for ax1, ax2, dist, samp_d, color in zip(
+    axes1, axes2, distributions, samp_ds, colors):
+    ax1.hist(dist, color=color)
+    ax1.set_yticklabels([])
+    ax1.set_xticklabels([])
+    ax2.hist(samp_d, color=color)
+    ax2.set_yticklabels([])
+    ax2.set_xticklabels([])
+    
+fig1.suptitle('Some population distributions:')
+fig2.suptitle('Sampling distribution of the sample mean for '
+              f'each population, sample size == {samp_size}:');
+```
